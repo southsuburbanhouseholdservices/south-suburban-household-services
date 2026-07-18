@@ -40,6 +40,7 @@ button, input, select, textarea { font: inherit; }
 }
 .nav-wrap { min-height: 78px; display: flex; align-items: center; justify-content: space-between; }
 .brand { display: inline-flex; align-items: center; gap: 12px; }
+.header-logo { width: 235px; height: 64px; object-fit: contain; object-position: left center; display: block; }
 .brand-mark {
   width: 46px; height: 46px; border-radius: 14px;
   display: grid; place-items: center;
@@ -90,6 +91,7 @@ button, input, select, textarea { font: inherit; }
   background: rgba(255,255,255,.9); border: 1px solid rgba(255,255,255,.8);
   border-radius: 28px; padding: 28px; box-shadow: var(--shadow); backdrop-filter: blur(12px);
 }
+.hero-logo { display: block; width: min(100%, 310px); max-height: 205px; object-fit: contain; margin: 0 auto 12px; }
 .hero-card-label { font-family: "Poppins"; color: var(--navy); font-size: 1.15rem; font-weight: 700; margin-bottom: 18px; }
 .quick-service { display: flex; gap: 14px; align-items: center; padding: 15px 0; border-bottom: 1px solid var(--line); }
 .quick-service > span { font-size: 1.75rem; }
@@ -132,7 +134,8 @@ button, input, select, textarea { font: inherit; }
   box-shadow: var(--shadow);
 }
 .about-panel p { color: white; font-family: "Poppins"; font-size: 1.55rem; line-height: 1.35; max-width: 380px; }
-.large-initials { position: absolute; top: 24px; right: 32px; font-family: "Poppins"; font-size: 8rem; font-weight: 800; opacity: .12; }
+.logo-panel { justify-content: space-between; align-items: center; }
+.about-logo { width: min(100%, 410px); max-height: 280px; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,.12)); }
 .about-badge {
   position: absolute; z-index: 2; top: 0; left: 0; background: var(--gold); color: var(--navy-dark);
   padding: 14px 20px; border-radius: 999px; font-weight: 800; box-shadow: 0 10px 25px rgba(0,0,0,.12);
@@ -187,7 +190,7 @@ button, input, select, textarea { font: inherit; }
 
 footer { background: #081b30; color: #c7d4df; padding: 64px 0 24px; }
 .footer-grid { display: grid; grid-template-columns: 1.6fr .65fr .9fr; gap: 60px; }
-.footer-brand .brand-copy strong { color: white; }
+.footer-logo { width: 270px; max-height: 120px; object-fit: contain; object-position: left center; filter: brightness(0) invert(1); }
 .footer-grid > div:first-child p { max-width: 470px; }
 .footer-links { display: flex; flex-direction: column; gap: 10px; }
 .footer-links strong { color: white; font-family: "Poppins"; margin-bottom: 5px; }
@@ -223,6 +226,36 @@ footer { background: #081b30; color: #c7d4df; padding: 64px 0 24px; }
   .about-panel { padding: 32px; }
   .footer-bottom { flex-direction: column; gap: 8px; }
   .request-form { padding: 22px; }
-  .brand-copy strong { font-size: .88rem; }
-  .brand-copy small { font-size: .68rem; }
+  .header-logo { width: 190px; height: 58px; }
+  .hero-logo { max-height: 180px; }
+}
+
+.how-section { background: #f7fafc; }
+.steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.steps-grid article { background: white; border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; }
+.steps-grid article > span { color: var(--gold); font-family: "Poppins"; font-weight: 800; }
+.steps-grid h3 { margin: 28px 0 10px; font-size: 1.08rem; }
+.steps-grid p { color: var(--muted); font-size: .92rem; }
+
+.pricing-section { background: #fbfcfd; }
+.pricing-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+.pricing-card { background: white; border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; box-shadow: 0 10px 30px rgba(12,44,75,.06); }
+.pricing-card h3 { margin: 0 0 20px; font-size: 1.35rem; }
+.price-list { display: flex; flex-direction: column; }
+.price-row { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; padding: 15px 0; border-top: 1px solid var(--line); }
+.price-row:first-child { border-top: 0; padding-top: 0; }
+.price-row div { display: flex; flex-direction: column; }
+.price-row strong { color: var(--navy-dark); }
+.price-row small { color: var(--muted); }
+.price-row > span { color: var(--blue); font-family: "Poppins"; font-weight: 800; white-space: nowrap; }
+.pricing-note { margin: 24px 0 0; color: var(--muted); text-align: center; }
+
+@media (max-width: 920px) {
+  .steps-grid { grid-template-columns: 1fr 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .steps-grid { grid-template-columns: 1fr; }
+  .price-row { grid-template-columns: 1fr; gap: 6px; }
 }
