@@ -1,455 +1,189 @@
-import { useState } from "react";
-import logoFull from "./assets/logo-full.png";
-import logoSimple from "./assets/logo-simple.png";
+import { useMemo, useState } from 'react'
+import {
+  ArrowRight, CalendarDays, Check, ChevronDown, Clock3, HeartHandshake,
+  Home, Leaf, Mail, MapPin, Menu, MessageCircle, ShieldCheck, Shirt,
+  Sparkles, Trash2, X
+} from 'lucide-react'
+import logoFull from './assets/logo-full.png'
+import logoSimple from './assets/logo-simple.png'
+import { siteConfig } from './siteConfig'
 
-const programs = [
+const services = [
   {
-    icon: "🧺",
-    title: "Laundry Club",
-    text: "Our flagship recurring service. We pick up, wash, dry, fold, and return your laundry on your assigned Neighborhood Service Day.",
-    note: "Plans from $39/month"
+    id: 'laundry', icon: Shirt, title: 'Laundry Club', kicker: 'Flagship recurring program',
+    intro: 'Wash, dry, fold, pickup, and return service organized around your Neighborhood Service Day.',
+    highlights: ['Official reusable Laundry Club bag', 'Standard or Free & Clear detergent included', 'Optional fabric softener included', 'Neatly folded clothing and paired socks'],
+    plans: [
+      ['Monthly Refresh', '1 pickup per month · 1 bag', '$39/mo'],
+      ['Every Other Week Club', '2 pickups per month · 1 bag each', '$75/mo'],
+      ['Kids Laundry Club', 'Weekly · ages 12 and under · 1 bag', '$119/mo'],
+      ['Weekly Laundry Club', 'Weekly · 1 bag', '$129/mo'],
+      ['Family Laundry Club', 'Weekly · 2 bags', '$199/mo'],
+    ],
+    note: 'One-time service: 1 bag $49 · 2 bags $89 · 3 bags $125. Add-ons available for comforters, bedding, delicates, hang dry, extra bags, and off-route pickup.'
   },
   {
-    icon: "♻️",
-    title: "Trash Bin Service",
-    text: "We place enrolled trash, recycling, and yard-waste bins at the curb before collection and return them afterward.",
-    note: "Weekly plans from $39/month"
+    id: 'trash', icon: Trash2, title: 'Trash Bin Service', kicker: 'Never worry about trash day again',
+    intro: 'We place eligible bins at the curb before municipal collection and return them afterward.',
+    highlights: ['Evening-before curb placement', 'Return after collection', 'Vacation holds at no charge', 'Trash, recycling, and eligible yard-waste bins'],
+    plans: [
+      ['Standard', 'Up to 2 bins · weekly', '$39/mo'],
+      ['Large Household', 'Up to 4 bins · weekly', '$49/mo'],
+      ['Additional Bin', 'Each additional eligible bin', '+$5/mo'],
+      ['Off-Route Visit', 'Special-request visit', '+$15'],
+    ],
+    note: 'Service does not include loose-trash handling, hauling, bulk-item removal, dumpsters, or bin cleaning.'
   },
   {
-    icon: "🍂",
-    title: "Seasonal Home Care",
-    text: "Route-based spring, summer, fall, and winter exterior care focused on safe, repeatable seasonal tasks.",
-    note: "Visits from $45"
+    id: 'seasonal', icon: Leaf, title: 'Seasonal Home Care', kicker: 'Routine exterior upkeep',
+    intro: 'Safe, repeatable exterior tasks that help homeowners stay ahead of the seasons.',
+    highlights: ['Spring and summer light cleanup', 'Fall front-yard leaf service', 'Winter walkway clearing after qualifying snowfall', 'One salt application included with winter visits'],
+    plans: [
+      ['Spring Visit', 'Light winter debris and seasonal exterior tasks', '$59'],
+      ['Summer Visit', 'Light debris and walkway care', '$49'],
+      ['Fall Visit', 'Front-yard leaves and walkway · up to 10 bags', '$89'],
+      ['Winter Visit', 'Walkways after qualifying snowfall of 2+ inches', '$45'],
+      ['Seasonal Essentials', 'One scheduled visit each season', '$229/yr'],
+      ['Four Seasons Plus', 'Expanded annual visit package', '$499/yr'],
+    ],
+    note: 'We do not perform construction, roofing, gutter work, electrical work, plumbing, tree removal, heavy landscaping, pressure washing, driveway plowing, or exterior repairs.'
   },
   {
-    icon: "🏡",
-    title: "Home Watch",
-    text: "Scheduled exterior visual checks while you are away, including photos and a digital visit summary.",
-    note: "Visits from $39"
-  }
-];
+    id: 'home-watch', icon: Home, title: 'Home Watch', kicker: 'Premium add-on for time away',
+    intro: 'Scheduled exterior visual checks with photos and a digital summary while you are away.',
+    highlights: ['Exterior walk-around', 'Visible check of accessible doors and windows', 'Visible mail or package retrieval when requested', 'Exterior photos and visit summary'],
+    plans: [
+      ['One-Time Home Watch', 'Single scheduled exterior visit', '$39'],
+      ['Vacation Watch', 'Up to 4 visits within 30 days', '$129'],
+      ['Monthly Home Watch', '2 visits per month', '$79/mo'],
+      ['Off-Route Visit', 'Special-request visit', '+$15'],
+    ],
+    note: 'Home Watch is not security, property management, emergency response, a home inspection, or a guarantee against damage or crime.'
+  },
+]
 
-const reasons = [
-  ["Reliable", "We arrive when we say we will and communicate before customers have to ask."],
-  ["Professional", "Every service follows clear standards designed to protect your property and privacy."],
-  ["Route-based", "Neighborhood Service Days reduce unnecessary driving and help keep service dependable."],
-  ["Family-owned", "We build long-term relationships and treat every household with respect."]
-];
-
-const pricingGroups = [
-  {
-    title: "Laundry Club",
-    rows: [
-      ["Monthly Refresh", "1 pickup/month • 1 bag", "$39/mo"],
-      ["Every Other Week Club", "2 pickups/month • 1 bag each", "$75/mo"],
-      ["Kids Laundry Club", "Weekly • ages 12 & under • 1 bag", "$119/mo"],
-      ["Weekly Laundry Club", "Weekly • 1 bag", "$129/mo"],
-      ["Family Laundry Club", "Weekly • 2 bags", "$199/mo"]
-    ]
-  },
-  {
-    title: "Trash Bin Service",
-    rows: [
-      ["Standard", "Up to 2 bins • weekly", "$39/mo"],
-      ["Large Household", "Up to 4 bins • weekly", "$49/mo"],
-      ["Additional Bin", "+1 enrolled bin", "+$5/mo"],
-      ["Off-Route Visit", "Special request, when available", "+$15"]
-    ]
-  },
-  {
-    title: "Seasonal Home Care",
-    rows: [
-      ["Spring Visit", "Routine exterior seasonal tasks", "$59"],
-      ["Summer Visit", "Light exterior upkeep", "$49"],
-      ["Fall Visit", "Front-yard leaf cleanup and prep", "$89"],
-      ["Winter Visit", "Qualifying snow service at 2+ inches", "$45"],
-      ["Seasonal Essentials", "1 visit each season", "$229/year"]
-    ]
-  },
-  {
-    title: "Home Watch",
-    rows: [
-      ["One-Time Home Watch", "Single scheduled exterior visit", "$39"],
-      ["Vacation Watch", "Up to 4 visits within 30 days", "$129"],
-      ["Monthly Home Watch", "2 scheduled visits per month", "$79/mo"],
-      ["Off-Route Visit", "Outside Neighborhood Service Day", "+$20"]
-    ]
-  }
-];
+const faqs = [
+  ['What is a Neighborhood Service Day?', 'Whenever practical, we organize service around your municipality’s trash collection schedule. Efficient neighborhood routing reduces travel, improves consistency, and helps keep pricing affordable.'],
+  ['Which communities do you serve?', 'We are launching in selected communities throughout Chicago’s south suburbs. Submit your address and we will confirm whether your neighborhood is currently on a route.'],
+  ['Do I need a long-term contract?', 'No long-term contract is required for standard recurring plans. Billing follows the selected plan, and vacation holds are available with advance notice.'],
+  ['How quickly is laundry returned?', 'Laundry is returned on the next scheduled Neighborhood Service Day or within one business day, depending on the assigned route.'],
+  ['What laundry items are not accepted?', 'We cannot accept dry-clean-only garments, leather, biohazards, mold-remediation items, or hazardous materials. Care-label and special-item restrictions may also apply.'],
+  ['Does Home Watch include entering my home?', 'No. The launch version is an exterior visual check only. We do not enter the home or provide security, emergency response, or inspection services.'],
+  ['What happens during bad weather or holidays?', 'Safety comes first. Routes may shift when weather or holidays affect normal operations. Customers receive clear notice and the next available service date.'],
+]
 
 function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [openFaq, setOpenFaq] = useState(0)
+  const [selectedService, setSelectedService] = useState('')
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const subject = encodeURIComponent(`New service request: ${data.get("service")}`);
-    const body = encodeURIComponent(
-`Name: ${data.get("name")}
-Email: ${data.get("email")}
-Phone: ${data.get("phone")}
-Service address / ZIP: ${data.get("address")}
-Municipal trash day: ${data.get("trashDay")}
-Program: ${data.get("service")}
-Preferred timing: ${data.get("timing")}
+  const mailto = useMemo(() => {
+    const subject = encodeURIComponent(`Service request${selectedService ? `: ${selectedService}` : ''}`)
+    return `mailto:${siteConfig.email}?subject=${subject}`
+  }, [selectedService])
 
-Details:
-${data.get("details")}`
-    );
-
-    setSubmitted(true);
-    window.location.href =
-      `mailto:southsuburbanhouseholdservices@gmail.com?subject=${subject}&body=${body}`;
-  };
-
-  const closeMenu = () => setMenuOpen(false);
+  const submitRequest = (event) => {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    const subject = encodeURIComponent(`Service request: ${data.get('service')}`)
+    const body = encodeURIComponent([
+      `Name: ${data.get('name')}`,
+      `Email: ${data.get('email')}`,
+      `Phone: ${data.get('phone') || 'Not provided'}`,
+      `Community / Address: ${data.get('location')}`,
+      `Service: ${data.get('service')}`,
+      `Preferred contact: ${data.get('contact')}`,
+      '', 'Request details:', data.get('details') || 'No additional details provided.'
+    ].join('\n'))
+    window.location.href = `mailto:${siteConfig.email}?subject=${subject}&body=${body}`
+  }
 
   return (
     <>
+      <a className="skip-link" href="#main">Skip to content</a>
       <header className="site-header">
-        <div className="container nav-wrap">
-          <a className="brand" href="#top" aria-label="South Suburban Household Services home">
-            <img className="header-logo" src={logoSimple} alt="South Suburban Household Services" />
-          </a>
-
-          <button
-            className="menu-button"
-            aria-label="Open navigation"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-
-          <nav className={menuOpen ? "nav-links open" : "nav-links"}>
-            <a href="#programs" onClick={closeMenu}>Programs</a>
-            <a href="#pricing" onClick={closeMenu}>Pricing</a>
-            <a href="#about" onClick={closeMenu}>About</a>
-            <a href="#faq" onClick={closeMenu}>FAQ</a>
-            <a className="button button-small" href="#request" onClick={closeMenu}>Request Service</a>
-          </nav>
-        </div>
+        <a className="brand" href="#top" aria-label={`${siteConfig.businessName} home`}>
+          <img src={logoSimple} alt="" />
+          <span>South Suburban<br /><b>Household Services</b></span>
+        </a>
+        <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label="Toggle menu">
+          {menuOpen ? <X /> : <Menu />}
+        </button>
+        <nav className={menuOpen ? 'open' : ''} onClick={() => setMenuOpen(false)}>
+          <a href="#services">Programs</a><a href="#how">How It Works</a><a href="#pricing">Pricing</a><a href="#about">About</a><a href="#faq">FAQ</a>
+          <a className="nav-cta" href="#request">Request Service <ArrowRight size={16} /></a>
+        </nav>
       </header>
 
-      <main id="top">
-        <section className="hero">
-          <div className="container hero-grid">
-            <div className="hero-copy">
-              <div className="eyebrow">Local • Family-Owned • Chicago South Suburbs</div>
-              <h1>Reliable help for everyday home life.</h1>
-              <p className="hero-lead">
-                Dependable recurring household services that give busy families, seniors,
-                travelers, and homeowners more time for what matters most.
-              </p>
-              <div className="hero-actions">
-                <a className="button" href="#request">Request Service</a>
-                <a className="button button-secondary" href="#programs">Explore Programs</a>
-              </div>
-              <div className="trust-row">
-                <span>✓ Clear communication</span>
-                <span>✓ Predictable service days</span>
-                <span>✓ Respectful local service</span>
-              </div>
-            </div>
-
-            <div className="hero-card">
-              <img className="hero-logo" src={logoFull} alt="South Suburban Household Services — Reliable help for everyday home life" />
-              <div className="hero-card-label">Our approved launch programs</div>
-              {programs.map((program) => (
-                <div className="quick-service" key={program.title}>
-                  <span>{program.icon}</span>
-                  <div><strong>{program.title}</strong><small>{program.note}</small></div>
-                </div>
-              ))}
-              <a href="#request" className="text-link">Check availability for your address →</a>
-            </div>
+      <main id="main">
+        <section className="hero" id="top">
+          <div className="hero-content">
+            <p className="eyebrow"><Sparkles size={15} /> Family-owned · Serving Chicago's south suburbs</p>
+            <h1>More time for what matters most.</h1>
+            <p className="hero-lead">Dependable recurring household services for busy families, seniors, travelers, and homeowners—organized neighborhood by neighborhood.</p>
+            <div className="hero-actions"><a className="button primary" href="#request">Request Service <ArrowRight size={18} /></a><a className="button secondary" href="#services">Explore Programs</a></div>
+            <div className="trust-strip"><span><Check /> Clear communication</span><span><Check /> Consistent service</span><span><Check /> Respect for your home</span></div>
+          </div>
+          <div className="hero-visual">
+            <div className="logo-card"><img src={logoFull} alt="South Suburban Household Services" /></div>
+            <div className="floating-card route-card"><CalendarDays /><div><b>Neighborhood Service Days</b><span>One route. Multiple ways to reclaim your time.</span></div></div>
+            <div className="floating-card promise-card"><HeartHandshake /><div><b>The South Suburban Standard</b><span>Reliable. Friendly. Professional.</span></div></div>
           </div>
         </section>
 
-        <section className="section intro-strip">
-          <div className="container intro-grid">
-            <div>
-              <span className="section-kicker light">The Neighborhood Service Day</span>
-              <h2>One neighborhood. One service day. Multiple programs.</h2>
-            </div>
-            <p>
-              Whenever practical, we organize service around each community’s municipal trash
-              collection schedule. This route-based approach reduces unnecessary driving,
-              improves reliability, and helps keep pricing affordable.
-            </p>
-          </div>
+        <section className="service-preview section" id="services">
+          <div className="section-heading"><p className="eyebrow">Four focused programs</p><h2>Simple services. Dependable routines.</h2><p>We stay focused on safe, repeatable, trainable services so every customer knows exactly what to expect.</p></div>
+          <div className="service-grid">{services.map(({ id, icon: Icon, title, intro, plans }) => <a className="service-card" href={`#${id}`} key={id}><div className="icon-wrap"><Icon /></div><h3>{title}</h3><p>{intro}</p><div><b>{plans[0][2]}</b><span>View program <ArrowRight size={16} /></span></div></a>)}</div>
         </section>
 
-        <section className="section" id="programs">
-          <div className="container">
-            <div className="section-heading">
-              <span className="section-kicker">Our programs</span>
-              <h2>Focused household support designed to be dependable.</h2>
-              <p>We intentionally stay within a clear service scope so every program can be delivered safely and consistently.</p>
-            </div>
-            <div className="service-grid">
-              {programs.map((program) => (
-                <article className="service-card" key={program.title}>
-                  <div className="service-icon">{program.icon}</div>
-                  <h3>{program.title}</h3>
-                  <p>{program.text}</p>
-                  <span className="service-note">{program.note}</span>
-                </article>
-              ))}
-            </div>
-          </div>
+        <section className="how-section" id="how">
+          <div className="how-copy"><p className="eyebrow light">The South Suburban difference</p><h2>Neighborhood Service Days make recurring help easier.</h2><p>Whenever practical, services are aligned with municipal trash schedules. That means less unnecessary driving, more predictable service windows, and a better customer experience.</p><a href="#request" className="text-link">Check route availability <ArrowRight size={17} /></a></div>
+          <div className="steps"><article><b>01</b><div><h3>Choose a program</h3><p>Select the recurring household support that fits your needs.</p></div></article><article><b>02</b><div><h3>Confirm your route</h3><p>We match your address to a practical Neighborhood Service Day.</p></div></article><article><b>03</b><div><h3>Enjoy one less worry</h3><p>We communicate clearly, complete the work carefully, and keep your routine simple.</p></div></article></div>
         </section>
 
-        <section className="section how-section">
-          <div className="container">
-            <div className="section-heading centered">
-              <span className="section-kicker">How it works</span>
-              <h2>Simple from the first request.</h2>
-            </div>
-            <div className="steps-grid">
-              <article><span>01</span><h3>Choose a program</h3><p>Tell us which approved program fits your household.</p></article>
-              <article><span>02</span><h3>We check your address</h3><p>We confirm service-area fit, municipal trash day, and route capacity.</p></article>
-              <article><span>03</span><h3>Your service day is assigned</h3><p>You receive clear written instructions before the first visit.</p></article>
-              <article><span>04</span><h3>We handle the recurring task</h3><p>We complete the work, document it when required, and communicate clearly.</p></article>
-            </div>
-          </div>
+        <section className="program-details section" id="pricing">
+          <div className="section-heading"><p className="eyebrow">Approved launch programs and pricing</p><h2>Clear options without confusing fine print.</h2><p>Recurring plans are the heart of the business. One-time and off-route options are available where noted.</p></div>
+          {services.map(({ id, icon: Icon, title, kicker, intro, highlights, plans, note }, index) => (
+            <article className={`program-detail ${index % 2 ? 'reverse' : ''}`} id={id} key={id}>
+              <div className="program-copy"><div className="large-icon"><Icon /></div><p className="eyebrow">{kicker}</p><h3>{title}</h3><p className="program-intro">{intro}</p><ul>{highlights.map(item => <li key={item}><Check />{item}</li>)}</ul><button className="inline-request" onClick={() => { setSelectedService(title); document.querySelector('#request')?.scrollIntoView({ behavior: 'smooth' }) }}>Request {title} <ArrowRight size={17} /></button></div>
+              <div className="pricing-card">{plans.map(([name, desc, price]) => <div className="price-row" key={name}><div><b>{name}</b><span>{desc}</span></div><strong>{price}</strong></div>)}<p className="pricing-note"><ShieldCheck size={18} />{note}</p></div>
+            </article>
+          ))}
         </section>
 
-        <section className="section pricing-section" id="pricing">
-          <div className="container">
-            <div className="section-heading">
-              <span className="section-kicker">Launch pricing</span>
-              <h2>Clear starting prices with no complicated sales process.</h2>
-              <p>Final availability depends on service area, route capacity, property access, and approved scope.</p>
-            </div>
-            <div className="pricing-grid">
-              {pricingGroups.map((group) => (
-                <article className="pricing-card" key={group.title}>
-                  <h3>{group.title}</h3>
-                  <div className="price-list">
-                    {group.rows.map(([name, details, price]) => (
-                      <div className="price-row" key={`${group.title}-${name}`}>
-                        <div><strong>{name}</strong><small>{details}</small></div>
-                        <span>{price}</span>
-                      </div>
-                    ))}
-                  </div>
-                </article>
-              ))}
-            </div>
-            <p className="pricing-note">One-time Laundry Club service and approved add-ons are also available. Request service for a complete recommendation.</p>
-          </div>
+        <section className="about-section" id="about">
+          <div className="about-copy"><p className="eyebrow">Why we exist</p><h2>Busy families deserve more time together.</h2><p>South Suburban Household Services focuses on the recurring tasks that quietly consume evenings and weekends. Our goal is to make dependable help affordable, reliable, and easy to use.</p><blockquote>“We build relationships, not transactions—and leave every customer with one less thing to worry about.”</blockquote></div>
+          <div className="standards"><article><Clock3 /><h3>Reliability</h3><p>We arrive when we say we will and communicate when conditions change.</p></article><article><MessageCircle /><h3>Communication</h3><p>Clear, friendly updates before, during, and after service.</p></article><article><ShieldCheck /><h3>Respect & Safety</h3><p>Focused service limits protect customers, employees, and property.</p></article><article><HeartHandshake /><h3>Consistency</h3><p>Repeatable standards create trust over the long term.</p></article></div>
         </section>
 
-        <section className="section about-section" id="about">
-          <div className="container about-grid">
-            <div className="about-visual">
-              <div className="about-badge">Serving our neighbors with care</div>
-              <div className="about-panel logo-panel">
-                <img className="about-logo" src={logoFull} alt="South Suburban Household Services logo" />
-                <p>We leave every customer with one less thing to worry about.</p>
-              </div>
-            </div>
-            <div>
-              <span className="section-kicker">About us</span>
-              <h2>Built to give local households more time for what matters.</h2>
-              <p>
-                South Suburban Household Services was founded on one simple belief: busy families
-                deserve more time together. We focus on recurring household tasks that quietly consume
-                evenings and weekends.
-              </p>
-              <p>
-                Our promise is to be reliable, friendly, professional, honest, consistent, respectful,
-                and easy to work with. We grow carefully and only add services that are safe, repeatable,
-                trainable, profitable, and consistent with our mission.
-              </p>
-              <a className="text-link" href="#request">Check availability →</a>
-            </div>
-          </div>
+        <section className="service-area section">
+          <div><p className="eyebrow">Launch service area</p><h2>Proudly serving Chicago's south suburbs.</h2><p>Routes will open community by community. Send your address to confirm current availability and your likely Neighborhood Service Day.</p></div><div className="area-card"><MapPin /><div><b>Route availability is expanding</b><span>Join the launch list for your neighborhood.</span></div><a href="#request">Check my address <ArrowRight size={16} /></a></div>
         </section>
 
-        <section className="section">
-          <div className="container">
-            <div className="section-heading centered">
-              <span className="section-kicker">The South Suburban Standard</span>
-              <h2>Dependability is the service.</h2>
-            </div>
-            <div className="reason-grid">
-              {reasons.map(([title, text], index) => (
-                <div className="reason-card" key={title}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <h3>{title}</h3>
-                  <p>{text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+        <section className="faq-section section" id="faq">
+          <div className="section-heading"><p className="eyebrow">Frequently asked questions</p><h2>Know what to expect before service begins.</h2></div>
+          <div className="faq-list">{faqs.map(([question, answer], index) => <article className="faq-item" key={question}><button onClick={() => setOpenFaq(openFaq === index ? -1 : index)} aria-expanded={openFaq === index}><span>{question}</span><ChevronDown className={openFaq === index ? 'rotate' : ''} /></button>{openFaq === index && <p>{answer}</p>}</article>)}</div>
         </section>
 
-        <section className="section service-area-section" id="service-area">
-          <div className="container service-area-grid">
-            <div>
-              <span className="section-kicker light">Service area</span>
-              <h2>Proudly serving Chicago’s south suburbs.</h2>
-              <p>
-                Our launch routes are centered around Blue Island and nearby south-suburban
-                communities. Availability varies by program, municipal collection schedule, and route capacity.
-              </p>
-              <p className="area-note">Send your address and municipal trash day so we can confirm the best Neighborhood Service Day.</p>
-            </div>
-            <div className="area-card">
-              <strong>Initial route focus</strong>
-              <div className="area-list">
-                <span>Blue Island</span>
-                <span>Alsip</span>
-                <span>Calumet Park</span>
-                <span>Posen</span>
-                <span>Robbins</span>
-                <span>Nearby communities</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="section" id="faq">
-          <div className="container faq-grid">
-            <div>
-              <span className="section-kicker">Frequently asked</span>
-              <h2>Important details before you enroll.</h2>
-            </div>
-            <div className="faq-list">
-              <details>
-                <summary>What is a Neighborhood Service Day?</summary>
-                <p>It is your assigned recurring route day. Whenever practical, it is organized around your municipality’s trash collection schedule.</p>
-              </details>
-              <details>
-                <summary>Can I combine programs?</summary>
-                <p>Yes. Laundry Club, Trash Bin Service, Seasonal Home Care, and Home Watch can be coordinated on the same route when capacity allows.</p>
-              </details>
-              <details>
-                <summary>Does Home Watch include entering my home?</summary>
-                <p>No. The approved launch service is an exterior visual check with photographs and a factual digital summary. It is not a home inspection or security service.</p>
-              </details>
-              <details>
-                <summary>What work is not included in Seasonal Home Care?</summary>
-                <p>We do not perform landscaping, mowing, tree removal, roof or gutter work, pressure washing, driveway plowing, heavy debris hauling, exterior repairs, or home inspections.</p>
-              </details>
-              <details>
-                <summary>Can recurring service be paused?</summary>
-                <p>Laundry Club and Trash Bin Service may be placed on a vacation hold at no charge when notice is provided.</p>
-              </details>
-              <details>
-                <summary>Does submitting a request guarantee a time slot?</summary>
-                <p>No. We first confirm service-area eligibility, approved scope, municipal trash day, and route capacity before promising a service date.</p>
-              </details>
-            </div>
-          </div>
-        </section>
-
-        <section className="section request-section" id="request">
-          <div className="container request-grid">
-            <div className="request-copy">
-              <span className="section-kicker light">Request service</span>
-              <h2>Let us check availability for your household.</h2>
-              <p>
-                Share your address, municipal trash day, and the program you are interested in.
-                We will review route capacity and respond with the next step.
-              </p>
-              <div className="contact-card">
-                <span>Email</span>
-                <a href="mailto:southsuburbanhouseholdservices@gmail.com">southsuburbanhouseholdservices@gmail.com</a>
-                <small>Business phone coming soon</small>
-              </div>
-            </div>
-
-            <form className="request-form" onSubmit={handleSubmit}>
-              <div className="form-row">
-                <label>Full name<input name="name" type="text" autoComplete="name" required /></label>
-                <label>Phone<input name="phone" type="tel" autoComplete="tel" required /></label>
-              </div>
-              <div className="form-row">
-                <label>Email<input name="email" type="email" autoComplete="email" required /></label>
-                <label>Service address / ZIP<input name="address" type="text" autoComplete="street-address" required /></label>
-              </div>
-              <div className="form-row">
-                <label>
-                  Program
-                  <select name="service" required defaultValue="">
-                    <option value="" disabled>Select a program</option>
-                    <option>Laundry Club</option>
-                    <option>Trash Bin Service</option>
-                    <option>Seasonal Home Care</option>
-                    <option>Home Watch</option>
-                    <option>Multiple Programs</option>
-                    <option>Not Sure Yet</option>
-                  </select>
-                </label>
-                <label>
-                  Municipal trash day
-                  <select name="trashDay" required defaultValue="">
-                    <option value="" disabled>Select a day</option>
-                    <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
-                    <option>Thursday</option><option>Friday</option><option>Saturday</option>
-                    <option>Not sure</option>
-                  </select>
-                </label>
-              </div>
-              <label>
-                Preferred timing
-                <select name="timing" required defaultValue="">
-                  <option value="" disabled>Select timing</option>
-                  <option>As soon as route capacity allows</option>
-                  <option>Within the next two weeks</option>
-                  <option>Next month</option>
-                  <option>Planning ahead</option>
-                </select>
-              </label>
-              <label>
-                Tell us what you need
-                <textarea name="details" rows="5" placeholder="Include frequency, number of laundry bags or bins, travel dates, seasonal needs, access notes, or questions." required />
-              </label>
-              <label className="consent">
-                <input type="checkbox" required />
-                <span>I agree to be contacted about this service request.</span>
-              </label>
-              <button className="button form-button" type="submit">Prepare My Request</button>
-              <p className="form-note">For this launch version, the form opens your email app with the request filled in.</p>
-              {submitted && <p className="success-message" role="status">Your email app should now open with the request prepared.</p>}
-            </form>
-          </div>
+        <section className="request-section" id="request">
+          <div className="request-copy"><p className="eyebrow light">Request service</p><h2>Let us take one recurring chore off your list.</h2><p>Tell us what you need and where you live. We will confirm route availability, answer questions, and explain the next step.</p><div className="contact-box"><Mail /><div><span>Email</span><a href={mailto}>{siteConfig.email}</a></div></div><div className="phone-placeholder"><MessageCircle /><div><span>Business phone</span><b>Coming soon</b><small>The phone number will be added here before public launch.</small></div></div></div>
+          <form onSubmit={submitRequest}>
+            <div className="form-row"><label>Full name<input name="name" autoComplete="name" required /></label><label>Email address<input name="email" type="email" autoComplete="email" required /></label></div>
+            <div className="form-row"><label>Phone number <small>(optional)</small><input name="phone" type="tel" autoComplete="tel" /></label><label>Community or service address<input name="location" autoComplete="street-address" required /></label></div>
+            <div className="form-row"><label>Program<select name="service" value={selectedService} onChange={e => setSelectedService(e.target.value)} required><option value="">Select a program</option>{services.map(s => <option key={s.title}>{s.title}</option>)}</select></label><label>Preferred contact<select name="contact"><option>Email</option><option>Phone call</option><option>Text message</option></select></label></div>
+            <label>How can we help?<textarea name="details" rows="5" placeholder="Tell us about the service, schedule, household, or questions you have." /></label>
+            <button className="button primary full" type="submit">Prepare Service Request <ArrowRight size={18} /></button>
+            <p className="form-note">For the initial launch, this button opens your email application with the request pre-filled. A direct online submission system can be connected later.</p>
+          </form>
         </section>
       </main>
 
       <footer>
-        <div className="container footer-grid">
-          <div>
-            <div className="brand footer-brand"><img className="footer-logo" src={logoSimple} alt="South Suburban Household Services" /></div>
-            <p>Laundry Club, Trash Bin Service, Seasonal Home Care, and Home Watch.</p>
-          </div>
-          <div className="footer-links">
-            <strong>Explore</strong>
-            <a href="#programs">Programs</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#about">About</a>
-            <a href="#faq">FAQ</a>
-          </div>
-          <div className="footer-links">
-            <strong>Contact</strong>
-            <a href="mailto:southsuburbanhouseholdservices@gmail.com">Email us</a>
-            <span>Blue Island, Illinois</span>
-            <a href="#request">Request Service</a>
-          </div>
-        </div>
-        <div className="container footer-bottom">
-          <span>© {new Date().getFullYear()} South Suburban Household Services</span>
-          <span>Reliable help for everyday home life.</span>
-        </div>
+        <div className="footer-main"><div className="footer-brand"><img src={logoSimple} alt="" /><div><b>{siteConfig.businessName}</b><span>{siteConfig.tagline}</span></div></div><div className="footer-nav"><a href="#services">Programs</a><a href="#pricing">Pricing</a><a href="#how">How It Works</a><a href="#faq">FAQ</a><a href="#request">Request Service</a></div></div>
+        <div className="footer-bottom"><span>© 2026 {siteConfig.businessName}. All rights reserved.</span><span>Serving {siteConfig.serviceArea}.</span></div>
       </footer>
     </>
-  );
+  )
 }
 
-export default App;
+export default App
