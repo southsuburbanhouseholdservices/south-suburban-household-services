@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import {
   ArrowRight, CalendarDays, Check, ChevronDown, Clock3, HeartHandshake,
   Home, Leaf, Mail, MapPin, Menu, MessageCircle, ShieldCheck, Shirt,
-  Sparkles, Trash2, X
+  Sparkles, Trash2, X, BadgeDollarSign
 } from 'lucide-react'
 import logoFull from './assets/logo-full.png'
 import logoSimple from './assets/logo-simple.png'
@@ -62,6 +62,43 @@ const services = [
   },
 ]
 
+
+const homePlans = [
+  {
+    name: 'Home Basics Plan',
+    audience: 'A simple monthly routine for individuals and couples.',
+    includes: ['Monthly Refresh Laundry Club', 'Standard Trash Bin Service'],
+    regular: '$78/mo',
+    price: '$69/mo',
+    savings: 'Save $9 each month'
+  },
+  {
+    name: 'Routine Relief Plan',
+    audience: 'Our recommended option for steady, dependable help.',
+    includes: ['Every Other Week Laundry Club', 'Standard Trash Bin Service'],
+    regular: '$114/mo',
+    price: '$99/mo',
+    savings: 'Save $15 each month',
+    recommended: true
+  },
+  {
+    name: 'Weekly Household Plan',
+    audience: 'Built for active households with weekly laundry needs.',
+    includes: ['Weekly Laundry Club', 'Standard Trash Bin Service'],
+    regular: '$168/mo',
+    price: '$149/mo',
+    savings: 'Save $19 each month'
+  },
+  {
+    name: 'Family Routine Plan',
+    audience: 'Our strongest recurring plan for larger family routines.',
+    includes: ['Family Laundry Club', 'Large Household Trash Bin Service'],
+    regular: '$248/mo',
+    price: '$229/mo',
+    savings: 'Save $19 each month'
+  },
+]
+
 const faqs = [
   ['What is a Neighborhood Service Day?', 'Whenever practical, we organize service around your municipality’s trash collection schedule. Efficient neighborhood routing reduces travel, improves consistency, and helps keep pricing affordable.'],
   ['Which communities do you serve?', 'We are launching in selected communities throughout Chicago’s south suburbs. Submit your address and we will confirm whether your neighborhood is currently on a route.'],
@@ -110,7 +147,7 @@ function App() {
           {menuOpen ? <X /> : <Menu />}
         </button>
         <nav className={menuOpen ? 'open' : ''} onClick={() => setMenuOpen(false)}>
-          <a href="#services">Programs</a><a href="#how">How It Works</a><a href="#pricing">Pricing</a><a href="#about">About</a><a href="#faq">FAQ</a>
+          <a href="#services">Programs</a><a href="#home-plans">Home Plans</a><a href="#how">How It Works</a><a href="#pricing">Pricing</a><a href="#about">About</a><a href="#faq">FAQ</a>
           <a className="nav-cta" href="#request">Request Service <ArrowRight size={16} /></a>
         </nav>
       </header>
@@ -125,15 +162,32 @@ function App() {
             <div className="trust-strip"><span><Check /> Clear communication</span><span><Check /> Consistent service</span><span><Check /> Respect for your home</span></div>
           </div>
           <div className="hero-visual">
-            <div className="logo-card"><img src={logoFull} alt="South Suburban Household Services" /></div>
-            <div className="floating-card route-card"><CalendarDays /><div><b>Neighborhood Service Days</b><span>One route. Multiple ways to reclaim your time.</span></div></div>
-            <div className="floating-card promise-card"><HeartHandshake /><div><b>The South Suburban Standard</b><span>Reliable. Friendly. Professional.</span></div></div>
+            <div className="logo-card clean"><img src={logoFull} alt="South Suburban Household Services" /></div>
+            <div className="hero-logo-note"><CalendarDays /><span><b>One neighborhood. One service day.</b> Multiple ways to reclaim your time.</span></div>
           </div>
         </section>
 
         <section className="service-preview section" id="services">
           <div className="section-heading"><p className="eyebrow">Four focused programs</p><h2>Simple services. Dependable routines.</h2><p>We stay focused on safe, repeatable, trainable services so every customer knows exactly what to expect.</p></div>
           <div className="service-grid">{services.map(({ id, icon: Icon, title, intro, plans }) => <a className="service-card" href={`#${id}`} key={id}><div className="icon-wrap"><Icon /></div><h3>{title}</h3><p>{intro}</p><div><b>{plans[0][2]}</b><span>View program <ArrowRight size={16} /></span></div></a>)}</div>
+        </section>
+
+        <section className="home-plans section" id="home-plans">
+          <div className="section-heading"><p className="eyebrow">South Suburban Home Plans</p><h2>Bundle recurring services and save.</h2><p>Laundry Club and Trash Bin Service are naturally coordinated around the same Neighborhood Service Day whenever practical. Home Plans make that routine simpler and more affordable.</p></div>
+          <div className="home-plan-grid">
+            {homePlans.map(plan => (
+              <article className={`home-plan-card ${plan.recommended ? 'recommended' : ''}`} key={plan.name}>
+                {plan.recommended && <div className="recommended-badge">Recommended</div>}
+                <div className="plan-icon"><BadgeDollarSign /></div>
+                <h3>{plan.name}</h3>
+                <p className="plan-audience">{plan.audience}</p>
+                <ul>{plan.includes.map(item => <li key={item}><Check />{item}</li>)}</ul>
+                <div className="plan-pricing"><span>Regularly {plan.regular}</span><strong>{plan.price}</strong><b>{plan.savings}</b></div>
+                <button className="button primary full" onClick={() => { setSelectedService(plan.name); document.querySelector('#request')?.scrollIntoView({ behavior: 'smooth' }) }}>Choose this plan <ArrowRight size={17} /></button>
+              </article>
+            ))}
+          </div>
+          <p className="home-plan-note"><ShieldCheck size={18} /> Home Plan pricing applies to recurring monthly services and depends on route capacity. Seasonal Home Care and Home Watch remain available as optional add-ons.</p>
         </section>
 
         <section className="how-section" id="how">
@@ -170,7 +224,7 @@ function App() {
           <form onSubmit={submitRequest}>
             <div className="form-row"><label>Full name<input name="name" autoComplete="name" required /></label><label>Email address<input name="email" type="email" autoComplete="email" required /></label></div>
             <div className="form-row"><label>Phone number <small>(optional)</small><input name="phone" type="tel" autoComplete="tel" /></label><label>Community or service address<input name="location" autoComplete="street-address" required /></label></div>
-            <div className="form-row"><label>Program<select name="service" value={selectedService} onChange={e => setSelectedService(e.target.value)} required><option value="">Select a program</option>{services.map(s => <option key={s.title}>{s.title}</option>)}</select></label><label>Preferred contact<select name="contact"><option>Email</option><option>Phone call</option><option>Text message</option></select></label></div>
+            <div className="form-row"><label>Program<select name="service" value={selectedService} onChange={e => setSelectedService(e.target.value)} required><option value="">Select a program</option>{homePlans.map(p => <option key={p.name}>{p.name}</option>)}{services.map(s => <option key={s.title}>{s.title}</option>)}</select></label><label>Preferred contact<select name="contact"><option>Email</option><option>Phone call</option><option>Text message</option></select></label></div>
             <label>How can we help?<textarea name="details" rows="5" placeholder="Tell us about the service, schedule, household, or questions you have." /></label>
             <button className="button primary full" type="submit">Prepare Service Request <ArrowRight size={18} /></button>
             <p className="form-note">For the initial launch, this button opens your email application with the request pre-filled. A direct online submission system can be connected later.</p>
@@ -179,7 +233,7 @@ function App() {
       </main>
 
       <footer>
-        <div className="footer-main"><div className="footer-brand"><img src={logoSimple} alt="" /><div><b>{siteConfig.businessName}</b><span>{siteConfig.tagline}</span></div></div><div className="footer-nav"><a href="#services">Programs</a><a href="#pricing">Pricing</a><a href="#how">How It Works</a><a href="#faq">FAQ</a><a href="#request">Request Service</a></div></div>
+        <div className="footer-main"><div className="footer-brand"><img src={logoSimple} alt="" /><div><b>{siteConfig.businessName}</b><span>{siteConfig.tagline}</span></div></div><div className="footer-nav"><a href="#services">Programs</a><a href="#home-plans">Home Plans</a><a href="#pricing">Pricing</a><a href="#how">How It Works</a><a href="#faq">FAQ</a><a href="#request">Request Service</a></div></div>
         <div className="footer-bottom"><span>© 2026 {siteConfig.businessName}. All rights reserved.</span><span>Serving {siteConfig.serviceArea}.</span></div>
       </footer>
     </>
