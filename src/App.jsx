@@ -143,7 +143,7 @@ function App() {
           <div className="hero-content">
             <p className="eyebrow"><Sparkles size={15} /> Family-owned · Serving Chicago's south suburbs</p>
             <h1>More time for what matters most.</h1>
-            <p className="hero-lead">Laundry pickup and delivery first—supported by dependable Trash Bin Service and Home Watch for households across Chicago’s south suburbs.</p>
+            <p className="hero-lead">Reliable household support focused on Laundry Club, Trash Bin Service, and Home Watch across Chicago's south suburbs.</p>
             <div className="hero-actions"><a className="button primary" href="#request">Request Service <ArrowRight size={18} /></a><a className="button secondary" href="#services">Explore Programs</a></div>
             <div className="trust-strip"><span><Check /> Clear communication</span><span><Check /> Consistent service</span><span><Check /> Respect for your home</span></div>
           </div>
@@ -154,7 +154,7 @@ function App() {
         </section>
 
         <section className="service-preview section" id="services">
-          <div className="section-heading"><p className="eyebrow">Three focused services</p><h2>Laundry first. Everyday support where it helps most.</h2><p>Laundry Club is our flagship service, supported by recurring Trash Bin Service and dependable Home Watch visits.</p></div>
+          <div className="section-heading"><p className="eyebrow">Three focused services</p><h2>Simple services. Dependable routines.</h2><p>Our launch is built around three dependable services: Laundry Club, Trash Bin Service, and Home Watch.</p></div>
           <div className="service-grid">{services.map(({ id, icon: Icon, title, intro, plans }) => <a className="service-card" href={`#${id}`} key={id}><div className="icon-wrap"><Icon /></div><h3>{title}</h3><p>{intro}</p><div><b>{plans[0][2]}</b><span>View program <ArrowRight size={16} /></span></div></a>)}</div>
         </section>
 
@@ -173,7 +173,7 @@ function App() {
               </article>
             ))}
           </div>
-          <p className="home-plan-note"><ShieldCheck size={18} /> Home Plan pricing applies to recurring Laundry Club and Trash Bin Service and depends on route capacity. Home Watch remains available separately for customers who need property check-ins while away.</p>
+          <p className="home-plan-note"><ShieldCheck size={18} /> Home Plan pricing applies to recurring monthly Laundry Club and Trash Bin Service and depends on route capacity. Home Watch is available separately when you travel or need an exterior property check.</p>
         </section>
 
         <section className="how-section" id="how">
@@ -182,7 +182,7 @@ function App() {
         </section>
 
         <section className="program-details section" id="pricing">
-          <div className="section-heading"><p className="eyebrow">Core services and launch pricing</p><h2>Focused services with clear pricing.</h2><p>Laundry Club leads our business. Trash Bin Service and Home Watch provide practical support without stretching beyond what we can deliver consistently.</p></div>
+          <div className="section-heading"><p className="eyebrow">Approved launch programs and pricing</p><h2>Clear options without confusing fine print.</h2><p>Recurring plans are the heart of the business. One-time and off-route options are available where noted.</p></div>
           {services.map(({ id, icon: Icon, title, kicker, intro, highlights, plans, note }, index) => (
             <article className={`program-detail ${index % 2 ? 'reverse' : ''}`} id={id} key={id}>
               <div className="program-copy"><div className="large-icon"><Icon /></div><p className="eyebrow">{kicker}</p><h3>{title}</h3><p className="program-intro">{intro}</p><ul>{highlights.map(item => <li key={item}><Check />{item}</li>)}</ul><button className="inline-request" onClick={() => { setSelectedService(title); document.querySelector('#request')?.scrollIntoView({ behavior: 'smooth' }) }}>Request {title} <ArrowRight size={17} /></button></div>
@@ -192,7 +192,7 @@ function App() {
         </section>
 
         <section className="about-section" id="about">
-          <div className="about-copy"><p className="eyebrow">Why we exist</p><h2>Busy families deserve more time together.</h2><p>South Suburban Household Services begins with the chore that consumes the most household time: laundry. We pair our flagship Laundry Club with dependable Trash Bin Service and Home Watch so customers can reclaim time without sacrificing quality or communication.</p><blockquote>“We build relationships, not transactions—and leave every customer with one less thing to worry about.”</blockquote></div>
+          <div className="about-copy"><p className="eyebrow">Why we exist</p><h2>Busy families deserve more time together.</h2><p>South Suburban Household Services focuses on the recurring tasks that quietly consume evenings and weekends. Our goal is to make dependable help affordable, reliable, and easy to use.</p><blockquote>“We build relationships, not transactions—and leave every customer with one less thing to worry about.”</blockquote></div>
           <div className="standards"><article><Clock3 /><h3>Reliability</h3><p>We arrive when we say we will and communicate when conditions change.</p></article><article><MessageCircle /><h3>Communication</h3><p>Clear, friendly updates before, during, and after service.</p></article><article><ShieldCheck /><h3>Respect & Safety</h3><p>Focused service limits protect customers, employees, and property.</p></article><article><HeartHandshake /><h3>Consistency</h3><p>Repeatable standards create trust over the long term.</p></article></div>
         </section>
 
@@ -206,7 +206,7 @@ function App() {
         </section>
 
         <section className="request-section" id="request">
-          <div className="request-copy"><p className="eyebrow light">Request service</p><h2>Let us take one recurring chore off your list.</h2><p>Tell us what you need and where you live. We will confirm route availability, answer questions, and explain the next step.</p><div className="contact-box"><Mail /><div><span>Email</span><a href={mailto}>{siteConfig.email}</a></div></div><div className="phone-placeholder"><MessageCircle /><div><span>Business phone</span><a href={`tel:${siteConfig.phone.replace(/[^\d+]/g, '')}`}>{siteConfig.phone}</a><small>Call or text for route availability and service questions.</small></div></div></div>
+          <div className="request-copy"><p className="eyebrow light">Request service</p><h2>Let us take one recurring chore off your list.</h2><p>Tell us what you need and where you live. We will confirm route availability, answer questions, and explain the next step.</p><div className="contact-box"><Mail /><div><span>Email</span><a href={mailto}>{siteConfig.email}</a></div></div><div className="phone-placeholder"><MessageCircle /><div><span>Business phone</span><a href={`tel:${siteConfig.phoneLink}`}><b>{siteConfig.phone}</b></a><small>Call or text to ask about service availability.</small></div></div></div>
           <form onSubmit={submitRequest}>
             <div className="form-row"><label>Full name<input name="name" autoComplete="name" required /></label><label>Email address<input name="email" type="email" autoComplete="email" required /></label></div>
             <div className="form-row"><label>Phone number <small>(optional)</small><input name="phone" type="tel" autoComplete="tel" /></label><label>Community or service address<input name="location" autoComplete="street-address" required /></label></div>
